@@ -1,0 +1,13 @@
+#popup {
+    visibility: hidden;
+}
+
+#popup.show {
+    visibility: visible;
+}
+
+.completed {
+    text-decoration: line-through;
+    opacity: 0.6;
+    color: #888;
+}
