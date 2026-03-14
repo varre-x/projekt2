@@ -29,6 +29,13 @@ async function deleteTask(id) {
     });
 };
 
+async function onPageLoad() {
+    const tasks = await getTasks();
+    for (const task of tasks) {
+        addTask(task.text, task.completed, task.id);
+    };
+}
+
 async function getTasks() {
     const response = await fetch('https://tinkr.tech/sdb/todoList/tasks', {
         method: 'GET',
@@ -36,12 +43,9 @@ async function getTasks() {
             'Authorization': 'Bearer JG4NnKsqDSj9NlX0NXNjyknXmGDTbrEhsZpV1RISy6g'
         }
     });
-    const tasks = await response.json();
-    for (const task of tasks) {
-        addTask(task.text, task.completed, task.id);
-    };
+    return await response.json();
 }
-getTasks();
+onPageLoad();
 
 async function updateTask(text, completed, id) {
     await fetch(`https://tinkr.tech/sdb/todoList/tasks/${id}`, {
@@ -81,6 +85,10 @@ function addTask(text, completed, id) {
 
 newBtn.addEventListener("click", ()=> {
     popup.classList.toggle("show");
+
+    if (popup.classList.contains("show")) {
+        input.focus();
+    }
 });
 
 document.addEventListener("click", (event) => {
@@ -89,13 +97,22 @@ document.addEventListener("click", (event) => {
     }
 });
 
-addBtn.addEventListener("click", ()=> {
-    addTask(input.value, false);
-    uploadTask(input.value, false);
+addBtn.addEventListener("click", async ()=> {
+    await uploadTask(input.value, false);
+    let tasks = await getTasks();
+    for (const task of tasks) {
+        if (task.text === input.value) {
+            addTask(task.text, task.completed, task.id);
+        }
+    }
     input.value = "";
     popup.classList.toggle("show");
 });
 
-
+input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        addBtn.click();
+    }
+});
 
 
