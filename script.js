@@ -79,12 +79,15 @@ function addTask(text, completed, id) {
     list.appendChild(task);
 };
 
-
-
 newBtn.addEventListener("click", ()=> {
     popup.classList.toggle("show");
 });
 
+document.addEventListener("click", (event) => {
+    if (popup.classList.contains("show") && event.target !== newBtn && event.target !== input && event.target !== addBtn && event.target !== popup) {
+        popup.classList.toggle("show");
+    }
+});
 
 addBtn.addEventListener("click", ()=> {
     addTask(input.value, false);
@@ -92,5 +95,7 @@ addBtn.addEventListener("click", ()=> {
     input.value = "";
     popup.classList.toggle("show");
 });
+
+
 
 
