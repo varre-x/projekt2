@@ -6,16 +6,89 @@ const popup = document.getElementById("popup");
 const input = document.getElementById("input");
 const addBtn = document.getElementById("addBtn");
 
+//t7pJ0_sFMA55OP2m-mYXfBHD8z5bYjsK9fxJyJh3FpM
+const loginBtn = document.getElementById("loginBtn");
+const signupBtn = document.getElementById("signupBtn");
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+let globalUsername = "";
+
+usernameInput.focus();
+
+loginBtn.addEventListener("click", async () => {
+    const unInput = usernameInput.value;
+    const password = passwordInput.value;
+    const userList = await getUsers();
+
+    for (const user of userList) {
+         if (user.username === unInput && user.password === password) {
+             document.getElementById("userLogin").classList.toggle("hide");
+            container.classList.toggle("show");
+            globalUsername = unInput;
+            loadTasks();
+        }
+    }
+    if (globalUsername === "") {
+        alert("Invalid username or password.");
+    }
+    
+});
+
+usernameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        loginBtn.click();
+    }
+});
+passwordInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        loginBtn.click();
+    }
+});
+
+async function getUsers() {
+    const response = await fetch('https://tinkr.tech/sdb/todoList/users', {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer t7pJ0_sFMA55OP2m-mYXfBHD8z5bYjsK9fxJyJh3FpM'
+        }
+    });
+    return await response.json();
+}
+
+async function uploadUser(username, password) {
+    const response = await fetch('https://tinkr.tech/sdb/todoList/users', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer t7pJ0_sFMA55OP2m-mYXfBHD8z5bYjsK9fxJyJh3FpM'
+        },
+        body: JSON.stringify({ username, password })
+    });
+    return await response.json();
+};
+
+signupBtn.addEventListener("click", async () => {
+    const userList = await getUsers();
+    for (const user of userList) {
+        if (user.username === usernameInput.value) {
+            alert("Username already exists.");
+            return;
+        }
+    }
+    await uploadUser(usernameInput.value, passwordInput.value);
+    alert("User created successfully. You can now log in.");
+});
+
 //JG4NnKsqDSj9NlX0NXNjyknXmGDTbrEhsZpV1RISy6g
 
-async function uploadTask(text, completed) {
+async function uploadTask(text, completed, username) {
     const response = await fetch('https://tinkr.tech/sdb/todoList/tasks', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer JG4NnKsqDSj9NlX0NXNjyknXmGDTbrEhsZpV1RISy6g'
         },
-        body: JSON.stringify({ text, completed })
+        body: JSON.stringify({ text, completed, username })
     });
     return await response.json();
 };
@@ -29,10 +102,10 @@ async function deleteTask(id) {
     });
 };
 
-async function onPageLoad() {
+async function loadTasks() {
     const tasks = await getTasks();
     for (const task of tasks) {
-        addTask(task.text, task.completed, task.id);
+        addTask(task.text, task.completed, task.id, task.username);
     };
 }
 
@@ -45,42 +118,44 @@ async function getTasks() {
     });
     return await response.json();
 }
-onPageLoad();
 
-async function updateTask(text, completed, id) {
+async function updateTask(text, completed, id, username) {
     await fetch(`https://tinkr.tech/sdb/todoList/tasks/${id}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer JG4NnKsqDSj9NlX0NXNjyknXmGDTbrEhsZpV1RISy6g'
         },
-        body: JSON.stringify({"text": text, "completed": completed})
+        body: JSON.stringify({"text": text, "completed": completed, "username": username})
     });
 }
 
-function addTask(text, completed, id) {
-    const task = document.createElement("li");
-    task.textContent = text;
+async function addTask(text, completed, id, username) {
+    if (username === globalUsername) {
+        const task = document.createElement("li");
+        task.textContent = text;
 
-    if (completed === true) {
-        task.classList.toggle('completed');
-    }
-    task.addEventListener('click', () => {
-        task.classList.toggle('completed');
-        updateTask(text, task.classList.contains('completed'), id);
-    });
+        if (completed === true) {
+            task.classList.toggle('completed');
+        }
+        task.addEventListener('click', () => {
+            task.classList.toggle('completed');
+            updateTask(text, task.classList.contains('completed'), id, globalUsername);
+        });
 
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "X";
-    deleteBtn.className = "deleteBtn";
-    task.appendChild(deleteBtn);
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "X";
+        deleteBtn.className = "deleteBtn";
+        task.appendChild(deleteBtn);
 
-    deleteBtn.addEventListener('click', ()=> {
-        deleteTask(id);
-        task.remove();
-    });
+        deleteBtn.addEventListener('click', ()=> {
+            deleteTask(id);
+            task.remove();
+        });
 
-    list.appendChild(task);
+        list.appendChild(task);
+    } else {return;}
+
 };
 
 newBtn.addEventListener("click", ()=> {
@@ -98,11 +173,11 @@ document.addEventListener("click", (event) => {
 });
 
 addBtn.addEventListener("click", async ()=> {
-    await uploadTask(input.value, false);
+    await uploadTask(input.value, false, globalUsername);
     let tasks = await getTasks();
     for (const task of tasks) {
         if (task.text === input.value) {
-            addTask(task.text, task.completed, task.id);
+            addTask(task.text, task.completed, task.id, task.username);
         }
     }
     input.value = "";
@@ -114,5 +189,8 @@ input.addEventListener("keydown", (event) => {
         addBtn.click();
     }
 });
+
+
+
 
 
