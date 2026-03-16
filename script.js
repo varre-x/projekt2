@@ -6,14 +6,43 @@ const popup = document.getElementById("popup");
 const input = document.getElementById("input");
 const addBtn = document.getElementById("addBtn");
 
+//user code
 //t7pJ0_sFMA55OP2m-mYXfBHD8z5bYjsK9fxJyJh3FpM
 const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
 const signupBtn = document.getElementById("signupBtn");
 const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 let globalUsername = "";
 
+//localStorage.setItem("currentUser", "");
+
+if (localStorage.getItem("currentUser") !== "") {
+    globalUsername = localStorage.getItem("currentUser");
+    document.getElementById("userLogin").classList.toggle("hide");
+    container.classList.toggle("show");
+    loadTasks();
+}
+
+let timer = setTimeout(logout, 600000); // 10min
+function resetTimer() {
+    clearTimeout(timer);
+    timer = setTimeout(logoutUser, 600000); // 10min
+}
+window.onload = resetTimer;
+document.onmousemove = resetTimer;
+document.onkeydown = resetTimer;
+
+function logout() {
+    localStorage.setItem("currentUser", "");
+    location.reload();
+}
+
 usernameInput.focus();
+
+logoutBtn.addEventListener("click", () => {
+    logout();
+});
 
 loginBtn.addEventListener("click", async () => {
     const unInput = usernameInput.value;
@@ -22,9 +51,10 @@ loginBtn.addEventListener("click", async () => {
 
     for (const user of userList) {
          if (user.username === unInput && user.password === password) {
-             document.getElementById("userLogin").classList.toggle("hide");
+            document.getElementById("userLogin").classList.toggle("hide");
             container.classList.toggle("show");
             globalUsername = unInput;
+            localStorage.setItem("currentUser", globalUsername);
             loadTasks();
         }
     }
@@ -79,6 +109,7 @@ signupBtn.addEventListener("click", async () => {
     alert("User created successfully. You can now log in.");
 });
 
+//actual todo list code
 //JG4NnKsqDSj9NlX0NXNjyknXmGDTbrEhsZpV1RISy6g
 
 async function uploadTask(text, completed, username) {
@@ -189,7 +220,6 @@ input.addEventListener("keydown", (event) => {
         addBtn.click();
     }
 });
-
 
 
 
