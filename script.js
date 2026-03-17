@@ -33,14 +33,16 @@ if (localStorage.getItem("currentUser") !== "") {
     loadTasks();
 }
 
-let timer = setTimeout(logout(), 600000); // 10min
+let timer = setTimeout(logout, 600000); // 10min
 function resetTimer() {
     clearTimeout(timer);
-    timer = setTimeout(logout(), 600000); // 10min
+    timer = setTimeout(logout, 600000); // 10min
 }
+
 window.onload = resetTimer;
 document.onmousemove = resetTimer;
 document.onkeydown = resetTimer;
+
 
 function logout() {
     localStorage.setItem("currentUser", "");
