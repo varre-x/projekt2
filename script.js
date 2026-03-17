@@ -1,3 +1,8 @@
+//password hashing
+//j2rjekorra liigutamine
+//v2rvide valik
+//taskide sorteerimine v2rvide p6hjal
+
 const list = document.getElementById("list");
 const container = document.getElementById("list-container");
 const newBtn = document.getElementById("newBtn");
@@ -16,6 +21,10 @@ const passwordInput = document.getElementById("password");
 let globalUsername = "";
 
 //localStorage.setItem("currentUser", "");
+const lsCurrentUser = localStorage.getItem("currentUser");
+if (lsCurrentUser === null) {
+    localStorage.setItem("currentUser", "");
+}
 
 if (localStorage.getItem("currentUser") !== "") {
     globalUsername = localStorage.getItem("currentUser");
@@ -24,10 +33,10 @@ if (localStorage.getItem("currentUser") !== "") {
     loadTasks();
 }
 
-let timer = setTimeout(logout, 600000); // 10min
+let timer = setTimeout(logout(), 600000); // 10min
 function resetTimer() {
     clearTimeout(timer);
-    timer = setTimeout(logoutUser, 600000); // 10min
+    timer = setTimeout(logout(), 600000); // 10min
 }
 window.onload = resetTimer;
 document.onmousemove = resetTimer;
@@ -198,7 +207,7 @@ newBtn.addEventListener("click", ()=> {
 });
 
 document.addEventListener("click", (event) => {
-    if (popup.classList.contains("show") && event.target !== newBtn && event.target !== input && event.target !== addBtn && event.target !== popup) {
+    if (popup.classList.contains("show") && event.target !== newBtn && event.target !== colorInput && event.target !== input && event.target !== addBtn && event.target !== popup) {
         popup.classList.toggle("show");
     }
 });

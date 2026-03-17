@@ -8,7 +8,7 @@
     border-radius:12px;
     width:300px;
     text-align:center;
-    transform:scale(0.8);
+    transform: scale(0.8);
     box-shadow:0 10px 30px rgba(0,0,0,0.3);
     display:flex;
     gap:8px; 
